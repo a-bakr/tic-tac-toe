@@ -1,6 +1,5 @@
 from api.tic_tac_toe import State, Player, BOARD_ROWS, BOARD_COLS, all_states
 from flask import Flask, render_template, jsonify, request
-import numpy as np
 
 app = Flask(__name__)
 

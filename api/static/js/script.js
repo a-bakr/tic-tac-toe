@@ -2,6 +2,36 @@ document.addEventListener("DOMContentLoaded", () => {
 	const board = document.getElementById("board");
 	const resetBtn = document.getElementById("resetBtn");
 	const statusDisplay = document.getElementById("status");
+	const soundToggleBtn = document.getElementById("soundToggleBtn");
+
+	// Sound state
+	let soundEnabled = true;
+
+	// Sound effects
+	const sounds = {
+		playerMove: new Audio("/static/sounds/player-move.mp3"),
+		aiMove: new Audio("/static/sounds/ai-move.mp3"),
+		win: new Audio("/static/sounds/win.mp3"),
+		lose: new Audio("/static/sounds/lose.mp3"),
+		draw: new Audio("/static/sounds/draw.mp3"),
+	};
+
+	// Preload sounds
+	Object.values(sounds).forEach((sound) => {
+		sound.load();
+	});
+
+	// Toggle sound on/off
+	soundToggleBtn.addEventListener("click", () => {
+		soundEnabled = !soundEnabled;
+		if (soundEnabled) {
+			soundToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+			soundToggleBtn.classList.remove("muted");
+		} else {
+			soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+			soundToggleBtn.classList.add("muted");
+		}
+	});
 
 	let gameState = {
 		board: Array(3)
@@ -47,14 +77,29 @@ document.addEventListener("DOMContentLoaded", () => {
 				// Update the turn status
 				updateTurnStatus();
 
-				// If AI made a first move, highlight it
+				// If AI made a first move, highlight it and play sound
 				if (data.aiMove) {
 					const aiRow = data.aiMove.row;
 					const aiCol = data.aiMove.col;
 					highlightCell(aiRow, aiCol);
+					playSound("aiMove");
 				}
 			})
 			.catch((error) => console.error("Error:", error));
+	}
+
+	// Play a sound effect
+	function playSound(soundName) {
+		if (sounds[soundName] && soundEnabled) {
+			// Stop and reset the sound if it's already playing
+			sounds[soundName].pause();
+			sounds[soundName].currentTime = 0;
+
+			// Play the sound
+			sounds[soundName].play().catch((error) => {
+				console.error("Error playing sound:", error);
+			});
+		}
 	}
 
 	// Make a move
@@ -63,6 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (gameState.gameOver || gameState.board[row][col] !== 0) {
 			return;
 		}
+
+		// Play player move sound
+		playSound("playerMove");
 
 		// Send the move to the server
 		fetch("/play", {
@@ -77,14 +125,26 @@ document.addEventListener("DOMContentLoaded", () => {
 				gameState = data;
 				updateBoard();
 
-				// Highlight AI's move
+				// Highlight AI's move and play sound
 				if (data.aiMove) {
 					const aiRow = data.aiMove.row;
 					const aiCol = data.aiMove.col;
 					highlightCell(aiRow, aiCol);
+					playSound("aiMove");
 				}
 
 				updateGameStatus();
+
+				// Play appropriate game end sound
+				if (gameState.gameOver) {
+					if (gameState.winner === (gameState.humanGoesFirst ? 1 : -1)) {
+						playSound("win");
+					} else if (gameState.winner === (gameState.humanGoesFirst ? -1 : 1)) {
+						playSound("lose");
+					} else {
+						playSound("draw");
+					}
+				}
 			})
 			.catch((error) => console.error("Error:", error));
 	}

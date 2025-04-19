@@ -123,6 +123,9 @@ h1 {
 
 .controls {
     margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 .reset-btn {
@@ -139,14 +142,35 @@ h1 {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.reset-btn:hover {
+.sound-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sound-btn:hover, .reset-btn:hover {
     background-color: var(--secondary-color);
     transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-.reset-btn:active {
+.sound-btn:active, .reset-btn:active {
     transform: translateY(0);
+}
+
+.sound-btn.muted {
+    background-color: var(--neutral-color);
 }
 
 .instructions {
