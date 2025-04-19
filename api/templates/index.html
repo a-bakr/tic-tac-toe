@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Tic Tac Toe vs AI</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+	</head>
+	<body>
+		<div class="container">
+			<h1>Tic Tac Toe <span class="vs">vs</span> <span class="ai">AI</span></h1>
+
+			<div class="status-container">
+				<div id="status" class="status">Your turn (X)</div>
+			</div>
+
+			<div class="board" id="board">
+				<!-- Board cells will be dynamically generated -->
+			</div>
+
+			<div class="controls">
+				<button id="resetBtn" class="reset-btn">New Game</button>
+			</div>
+
+			<div class="instructions">
+				<p>Players alternate going first with each new game</p>
+				<p>X always goes first, O always goes second</p>
+				<p>Click on any cell to make your move</p>
+			</div>
+		</div>
+
+		<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+	</body>
+</html>

@@ -1,28 +1,63 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fflask3&demo-title=Flask%203%20%2B%20Vercel&demo-description=Use%20Flask%203%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fflask3-python-template.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994156/random/flask.png)
+# Tic Tac Toe vs AI
 
-# Flask + Vercel
+A modern web application that allows you to play Tic Tac Toe against an AI opponent trained using reinforcement learning.
 
-This example shows how to use Flask 3 on Vercel with Serverless Functions using the [Python Runtime](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python).
+## Features
 
-## Demo
+- Clean, modern UI
+- Responsive design that works on desktop and mobile
+- Play against an AI that has learned optimal strategies
+- Players alternate going first with each new game
+- Visual feedback for game state and moves
 
-https://flask-python-template.vercel.app/
+## Requirements
 
-## How it Works
+- Python 3.6+
+- Flask
+- NumPy
 
-This example uses the Web Server Gateway Interface (WSGI) with Flask to enable handling requests on Vercel with Serverless Functions.
+## Installation
 
-## Running Locally
+1. Clone this repository
+2. Install the required dependencies:
 
 ```bash
-npm i -g vercel
-vercel dev
+pip install flask numpy
 ```
 
-Your Flask application is now available at `http://localhost:3000`.
+## Running the Application
 
-## One-Click Deploy
+1. Make sure the AI policy files are available in the `policy` directory. If not, you can train the AI by running:
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
+```bash
+python tic_tac_toe.py
+```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fflask3&demo-title=Flask%203%20%2B%20Vercel&demo-description=Use%20Flask%203%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fflask3-python-template.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994156/random/flask.png)
+2. Start the web application:
+
+```bash
+python api/index.py
+```
+
+3. Open your web browser and navigate to `http://localhost:5000`
+
+## How to Play
+
+- Players alternate who goes first with each new game
+- X always goes first, O always goes second
+- Click on any empty cell to make your move
+- The AI will automatically respond with its move
+- The game will indicate when someone wins or if there's a draw
+- Click the "New Game" button to start a new game and switch who goes first
+
+## Game Logic
+
+The AI uses reinforcement learning techniques to learn optimal play strategies. The backend is written in Python, while the frontend uses HTML, CSS, and JavaScript to provide a responsive and interactive gaming experience.
+
+## Credits
+
+This application combines a reinforcement learning Tic Tac Toe implementation with a modern web interface.
+
+## License
+
+MIT 
