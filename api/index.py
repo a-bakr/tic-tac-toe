@@ -1,4 +1,4 @@
-from tic_tac_toe import State, Player, BOARD_ROWS, BOARD_COLS, all_states
+from api.tic_tac_toe import State, Player, BOARD_ROWS, BOARD_COLS, all_states
 from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__)
