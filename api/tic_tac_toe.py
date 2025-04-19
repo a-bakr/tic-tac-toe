@@ -6,7 +6,7 @@ BOARD_ROWS = 3
 BOARD_COLS = 3
 BOARD_SIZE = BOARD_ROWS * BOARD_COLS
 
-base_dir = 'policy'
+base_dir = 'api/policy'
 
 
 class State:
@@ -244,6 +244,8 @@ class Player:
             raise e
     
     def save_policy(self):
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir, exist_ok=True)
         with open(f'{base_dir}/policy_%s.bin' % ('first' if self.symbol == 1 else 'second'), 'wb') as f:
             print(f'Saving policy to {base_dir}/policy_%s.bin' % ('first' if self.symbol == 1 else 'second'))
             pickle.dump(self.estimations, f)
