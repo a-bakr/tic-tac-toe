@@ -96,6 +96,17 @@ h1 {
     transform: scale(1.05);
 }
 
+.board.disabled .cell {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.board.disabled .cell:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: none;
+}
+
 .cell.x {
     color: #e74c3c;
 }
@@ -143,34 +154,21 @@ h1 {
 }
 
 .sound-btn {
-    background-color: var(--secondary-color);
-    color: white;
-    border: none;
-    padding: 0.8rem;
-    font-size: 1rem;
-    border-radius: 50%;
-    width: 3rem;
-    height: 3rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: none;
 }
 
-.sound-btn:hover, .reset-btn:hover {
+.sound-btn.muted {
+    display: none;
+}
+
+.reset-btn:hover {
     background-color: var(--secondary-color);
     transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-.sound-btn:active, .reset-btn:active {
+.reset-btn:active {
     transform: translateY(0);
-}
-
-.sound-btn.muted {
-    background-color: var(--neutral-color);
 }
 
 .instructions {
@@ -178,6 +176,32 @@ h1 {
     font-size: 0.9rem;
     margin-top: 1.5rem;
     line-height: 1.6;
+}
+
+.repo-link {
+    margin-top: 1rem;
+}
+
+.repo-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.repo-link a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.repo-link a i {
+    font-size: 1.2rem;
 }
 
 /* Winner status styles */

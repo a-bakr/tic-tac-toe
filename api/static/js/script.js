@@ -4,34 +4,13 @@ document.addEventListener("DOMContentLoaded", () => {
 	const statusDisplay = document.getElementById("status");
 	const soundToggleBtn = document.getElementById("soundToggleBtn");
 
-	// Sound state
-	let soundEnabled = true;
-
 	// Sound effects
-	const sounds = {
-		playerMove: new Audio("/static/sounds/player-move.mp3"),
-		aiMove: new Audio("/static/sounds/ai-move.mp3"),
-		win: new Audio("/static/sounds/win.mp3"),
-		lose: new Audio("/static/sounds/lose.mp3"),
-		draw: new Audio("/static/sounds/draw.mp3"),
-	};
+	const moveSound = new Audio("/static/sounds/move.mp3");
 
-	// Preload sounds
-	Object.values(sounds).forEach((sound) => {
-		sound.load();
-	});
-
-	// Toggle sound on/off
-	soundToggleBtn.addEventListener("click", () => {
-		soundEnabled = !soundEnabled;
-		if (soundEnabled) {
-			soundToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-			soundToggleBtn.classList.remove("muted");
-		} else {
-			soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-			soundToggleBtn.classList.add("muted");
-		}
-	});
+	// Remove sound toggle button from DOM
+	if (soundToggleBtn) {
+		soundToggleBtn.style.display = "none";
+	}
 
 	let gameState = {
 		board: Array(3)
@@ -41,6 +20,16 @@ document.addEventListener("DOMContentLoaded", () => {
 		winner: null,
 		humanGoesFirst: true,
 	};
+
+	// Disable board input (when it's AI's turn)
+	function disableBoardInput() {
+		board.classList.add("disabled");
+	}
+
+	// Enable board input (when it's human's turn)
+	function enableBoardInput() {
+		board.classList.remove("disabled");
+	}
 
 	// Initialize the game
 	function initGame() {
@@ -63,6 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Reset the game
 	function resetGame() {
+		// Disable board input during reset
+		disableBoardInput();
+
 		fetch("/reset", {
 			method: "POST",
 			headers: {
@@ -71,35 +63,50 @@ document.addEventListener("DOMContentLoaded", () => {
 		})
 			.then((response) => response.json())
 			.then((data) => {
+				// Store AI move if AI goes first
+				const aiMove = data.aiMove;
+
+				// If AI goes first, temporarily hide its move
+				if (aiMove) {
+					const aiSymbol = data.humanGoesFirst ? -1 : 1;
+					data.board[aiMove.row][aiMove.col] = 0;
+				}
+
+				// Update game state and board without AI's move
 				gameState = data;
 				updateBoard();
 
 				// Update the turn status
 				updateTurnStatus();
 
-				// If AI made a first move, highlight it and play sound
-				if (data.aiMove) {
-					const aiRow = data.aiMove.row;
-					const aiCol = data.aiMove.col;
-					highlightCell(aiRow, aiCol);
-					playSound("aiMove");
+				// If AI made a first move, add it after a delay
+				if (aiMove) {
+					// Set status to show it's user's turn with the correct symbol
+					if (!gameState.humanGoesFirst) {
+						const symbol = "X";
+						statusDisplay.textContent = `Your turn (${symbol})`;
+						statusDisplay.className = "status";
+					}
+
+					setTimeout(() => {
+						// Apply AI's move to the board
+						const aiSymbol = gameState.humanGoesFirst ? -1 : 1;
+						gameState.board[aiMove.row][aiMove.col] = aiSymbol;
+						updateBoard();
+						highlightCell(aiMove.row, aiMove.col);
+
+						// Play move sound for AI's first move
+						moveSound.play();
+
+						// Enable board input for human's turn
+						enableBoardInput();
+					}, 1000);
+				} else {
+					// Human goes first, enable board input
+					enableBoardInput();
 				}
 			})
 			.catch((error) => console.error("Error:", error));
-	}
-
-	// Play a sound effect
-	function playSound(soundName) {
-		if (sounds[soundName] && soundEnabled) {
-			// Stop and reset the sound if it's already playing
-			sounds[soundName].pause();
-			sounds[soundName].currentTime = 0;
-
-			// Play the sound
-			sounds[soundName].play().catch((error) => {
-				console.error("Error playing sound:", error);
-			});
-		}
 	}
 
 	// Make a move
@@ -109,8 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
 			return;
 		}
 
-		// Play player move sound
-		playSound("playerMove");
+		// Play move sound for human move
+		moveSound.play();
+
+		// Disable board input immediately after human makes a move
+		disableBoardInput();
 
 		// Send the move to the server
 		fetch("/play", {
@@ -122,29 +132,46 @@ document.addEventListener("DOMContentLoaded", () => {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				gameState = data;
+				// Store AI move but don't apply it yet
+				const aiMove = data.aiMove;
+
+				// Create a temporary game state without the AI move
+				const tempGameState = JSON.parse(JSON.stringify(data));
+
+				// If AI made a move, temporarily remove it from the board
+				if (aiMove) {
+					const aiSymbol = gameState.humanGoesFirst ? -1 : 1;
+					tempGameState.board[aiMove.row][aiMove.col] = 0;
+				}
+
+				// Update game state and board without AI's move
+				gameState = tempGameState;
 				updateBoard();
 
-				// Highlight AI's move and play sound
-				if (data.aiMove) {
-					const aiRow = data.aiMove.row;
-					const aiCol = data.aiMove.col;
-					highlightCell(aiRow, aiCol);
-					playSound("aiMove");
-				}
+				// Update status to show AI is thinking
+				const aiSymbol = gameState.humanGoesFirst ? "O" : "X";
+				statusDisplay.textContent = `AI is thinking (${aiSymbol})...`;
 
-				updateGameStatus();
+				// Add 1 second delay before showing the AI's move
+				setTimeout(() => {
+					// Apply AI's move to the game state
+					if (aiMove) {
+						const aiSymbol = gameState.humanGoesFirst ? -1 : 1;
+						gameState.board[aiMove.row][aiMove.col] = aiSymbol;
+						updateBoard();
+						highlightCell(aiMove.row, aiMove.col);
 
-				// Play appropriate game end sound
-				if (gameState.gameOver) {
-					if (gameState.winner === (gameState.humanGoesFirst ? 1 : -1)) {
-						playSound("win");
-					} else if (gameState.winner === (gameState.humanGoesFirst ? -1 : 1)) {
-						playSound("lose");
-					} else {
-						playSound("draw");
+						// Play move sound for AI move
+						moveSound.play();
 					}
-				}
+
+					updateGameStatus();
+
+					// Re-enable board input if game isn't over
+					if (!gameState.gameOver) {
+						enableBoardInput();
+					}
+				}, 1000);
 			})
 			.catch((error) => console.error("Error:", error));
 	}
