@@ -5,10 +5,6 @@ import os
 
 app = Flask(__name__)
 
-# Ensure policy directory exists
-if not os.path.exists('policy'):
-    os.makedirs('policy')
-
 class GameState:
     def __init__(self):
         self.state = State()
